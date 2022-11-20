@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.js": "/static/js/main.ede12e5a.js",
-    "index.html": "/index.html",
-    "main.ede12e5a.js.map": "/static/js/main.ede12e5a.js.map"
+    "main.js": "/react-node-mongo/frontend/static/js/main.ede12e5a.js",
+    "index.html": "/react-node-mongo/frontend/index.html",
+    "main.ede12e5a.js.map": "/react-node-mongo/frontend/static/js/main.ede12e5a.js.map"
   },
   "entrypoints": [
     "static/js/main.ede12e5a.js"
