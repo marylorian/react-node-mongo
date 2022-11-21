@@ -25,7 +25,7 @@
     "prettier": "prettier --write .",
     "prettier-check": "prettier --check .",
     "predeploy": "npm run build",
-    "deploy": "npm run predeploy && gh-pages -d build"
+    "deploy": "gh-pages -d build"
   },
   "browserslist": {
     "production": [
