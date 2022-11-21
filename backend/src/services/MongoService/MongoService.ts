@@ -1,52 +1,36 @@
-import { MongoClient } from "mongodb";
-import assert from "assert";
+import mongoose from "mongoose";
 
-import {
-  insertDocument,
-  findDocuments,
-  updateDocument,
-} from "../dbOperationsService/dbOperationsService";
-
-const url = "mongodb://127.0.0.1:27017/";
-const client = new MongoClient(url);
+import Dishes from "../../models/dishes";
 
 const dbname = "confusion";
+const url = `mongodb://127.0.0.1:27017/${dbname}`;
 
 async function main() {
-  await client.connect();
+  const db = await mongoose.connect(url);
   console.log("Connected successfully to server");
-  const db = client.db(dbname);
 
   try {
-    const { insertedId } = await insertDocument(
-      db,
-      { name: "Newbie", description: "Just a newbie" },
-      "dishes"
-    );
+    const newDish = new Dishes({
+      name: "New Dish 1",
+      description: "New descr",
+    });
 
-    await findDocuments(db, "dishes");
+    const dish = await newDish.save();
+    console.log("saved", { dish });
 
-    await updateDocument(
-      db,
-      { name: "Newbie", _id: insertedId },
-      { description: "UPDATED newbie" },
-      "dishes"
-    );
-
-    const docs = await findDocuments(db, "dishes");
-    console.log("Found docs after updating");
-    console.log({ docs });
-
-    await db.dropCollection("dishes");
-    client.close();
+    const dishes = await Dishes.find({}).exec();
+    console.log("found", { dishes });
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
+
+  mongoose.connection.close();
+
+  setTimeout(function () {
+    mongoose.disconnect();
+  }, 1000);
 
   return "done.";
 }
 
-main()
-  .then(console.log)
-  .catch(console.error)
-  .finally(() => client.close());
+main();

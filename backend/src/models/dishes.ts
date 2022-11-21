@@ -1,20 +1,23 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
-import { commentSchema } from './comments'
+import { commentSchema } from "./comments";
 
-export const dishSchema = new mongoose.Schema({
+export const dishSchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        unique: true,
-        required: true
+      type: String,
+      unique: true,
+      required: true,
     },
     description: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
-    comments: [commentSchema]
-}, {
-    timestamps: true
-});
+    comments: [commentSchema],
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.model("Dish", dishSchema)
+export default mongoose.model("Dish", dishSchema);
