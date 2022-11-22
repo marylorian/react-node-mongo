@@ -1,16 +1,26 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import logger from "jet-logger";
+import session from 'express-session'
+import sessionFileStore from 'session-file-store'
 
 import { HttpCode } from "./constants/httpCodes";
+import { Environments } from "./constants/environments";
 import { dishRouter } from "./routes/dishRouter";
 import { promoRouter } from "./routes/promoRouter";
 import { leaderRouter } from "./routes/leaderRouter";
+import { indexRouter } from "./routes/indexRouter";
+import { RouteError } from "./types/RouteError";
 
 dotenv.config();
 
 const app = express();
 const port = Number(process.env.PORT) || 8080;
+const FileStore = sessionFileStore(session);
 
 const dbname = "confusion";
 const url = `mongodb://127.0.0.1:27017/${dbname}`;
@@ -20,24 +30,55 @@ mongoose
   .then(() => console.log("Connected successfully to DB server"));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser("12345-67890-09876-54321"));
+
+// Show routes called in console during development
+if (process.env.NODE_ENV === Environments.Dev) {
+  app.use(morgan("dev"));
+}
+
+// Security
+if (process.env.NODE_ENV === Environments.Prod) {
+  app.use(helmet());
+}
+
+const basicAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (req.signedCookies.user && req.signedCookies.user === "admin") {
+    return next();
+  }
+
+  if (authHeader) {
+    const [username, password] = Buffer.from(authHeader.split(" ")[1], "base64")
+      .toString()
+      .split(":");
+
+    if (username === "admin" && password === "password") {
+      res.cookie("user", username, { signed: true });
+      return next();
+    }
+  }
+
+  res.setHeader("WWW-Authenticate", "Basic");
+  res.status(HttpCode.Unauthorized);
+  next(new RouteError(HttpCode.Unauthorized, "You are not authorized"));
+};
+
+app.use(basicAuth);
+
+app.use("/", indexRouter);
 app.use("/dishes", dishRouter);
 app.use("/promotions", promoRouter);
 app.use("/leaders", leaderRouter);
 
 // error handler
 app.use((err, req, res, next) => {
-  // only for dev env
-  res.locals.message = err.message;
-  res.locals.error = err;
-
-  res.status(err.status || HttpCode.InternalError);
-  res.render("error");
-});
-
-app.get("/", (req, res) => {
-  res.statusCode = HttpCode.Success;
-  res.setHeader("Content-Type", "text/html");
-  res.end("<html><body><h1>This is an Express Server</h1></body></html>");
+  logger.err(err, true);
+  return res
+    .status(err.status || HttpCode.InternalError)
+    .json({ error: err.message });
 });
 
 app.listen(port, () => {
