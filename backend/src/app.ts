@@ -13,7 +13,8 @@ import { dishRouter } from "./routes/dishRouter";
 import { promoRouter } from "./routes/promoRouter";
 import { leaderRouter } from "./routes/leaderRouter";
 import { indexRouter } from "./routes/indexRouter";
-import { RouteError } from "./types/RouteError";
+import { basicAuth } from "./middlewares/auth";
+import { userRouter } from "./routes/userRouter";
 
 dotenv.config();
 
@@ -50,32 +51,11 @@ if (process.env.NODE_ENV === Environments.Prod) {
   app.use(helmet());
 }
 
-const basicAuth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (req.session.user) {
-    return next();
-  }
-
-  if (authHeader) {
-    const [username, password] = Buffer.from(authHeader.split(" ")[1], "base64")
-      .toString()
-      .split(":");
-
-    if (username === "admin" && password === "password") {
-      req.session.user = "admin";
-      return next();
-    }
-  }
-
-  res.setHeader("WWW-Authenticate", "Basic");
-  res.status(HttpCode.Unauthorized);
-  next(new RouteError(HttpCode.Unauthorized, "You are not authorized"));
-};
+app.use("/", indexRouter);
+app.use("/auth", userRouter);
 
 app.use(basicAuth);
 
-app.use("/", indexRouter);
 app.use("/dishes", dishRouter);
 app.use("/promotions", promoRouter);
 app.use("/leaders", leaderRouter);
