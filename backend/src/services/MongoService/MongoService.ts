@@ -9,26 +9,47 @@ async function main() {
   const db = await mongoose.connect(url);
   console.log("Connected successfully to server");
 
-  try {
-    const newDish = new Dishes({
-      name: "New Dish 1",
-      description: "New descr",
+  Dishes.create({
+    name: "New Dish 4",
+    description: "New descr",
+  })
+    .then(({ _id }) => {
+      return Dishes.findByIdAndUpdate(
+        _id,
+        {
+          $set: { description: "updated description" },
+        },
+        { new: true }
+      ).exec();
+    })
+    .then((dish) => {
+      dish?.comments.push({
+        rating: 5,
+        comment: "Delicious!",
+        author: "Mario B",
+      });
+
+      return dish?.save();
+    })
+    .then((dish) => {
+      console.log(dish);
+
+      return Dishes.remove({});
+    })
+    .then((afterRemoval) => {
+      console.log({ afterRemoval });
+
+      return Dishes.find({}).exec();
+    })
+    .then((dishes) => {
+      console.log({ dishes });
+
+      return mongoose.connection.close();
+    })
+    .catch((err) => {
+      console.error(err);
+      mongoose.connection.close();
     });
-
-    const dish = await newDish.save();
-    console.log("saved", { dish });
-
-    const dishes = await Dishes.find({}).exec();
-    console.log("found", { dishes });
-  } catch (err) {
-    console.error(err);
-  }
-
-  mongoose.connection.close();
-
-  setTimeout(function () {
-    mongoose.disconnect();
-  }, 1000);
 
   return "done.";
 }

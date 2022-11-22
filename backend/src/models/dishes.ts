@@ -13,6 +13,22 @@ export const dishSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      default: "Starter",
+    },
+    label: {
+      type: String,
+      default: "",
+    },
+    price: {
+      type: Number,
+      default: 0,
+    },
+    image: {
+      type: String,
+      default: "",
+    },
     comments: [commentSchema],
   },
   {
