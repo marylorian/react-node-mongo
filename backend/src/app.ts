@@ -2,11 +2,10 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import helmet from "helmet";
-import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import logger from "jet-logger";
-import session from 'express-session'
-import sessionFileStore from 'session-file-store'
+import session from "express-session";
+import sessionFileStore from "session-file-store";
 
 import { HttpCode } from "./constants/httpCodes";
 import { Environments } from "./constants/environments";
@@ -31,7 +30,15 @@ mongoose
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser("12345-67890-09876-54321"));
+
+app.use(
+  session({
+    name: "session-id",
+    secret: "12345-67890-09876-54321",
+    resave: false,
+    store: new FileStore({}),
+  })
+);
 
 // Show routes called in console during development
 if (process.env.NODE_ENV === Environments.Dev) {
@@ -46,7 +53,7 @@ if (process.env.NODE_ENV === Environments.Prod) {
 const basicAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (req.signedCookies.user && req.signedCookies.user === "admin") {
+  if (req.session.user) {
     return next();
   }
 
@@ -56,7 +63,7 @@ const basicAuth = (req, res, next) => {
       .split(":");
 
     if (username === "admin" && password === "password") {
-      res.cookie("user", username, { signed: true });
+      req.session.user = "admin";
       return next();
     }
   }
