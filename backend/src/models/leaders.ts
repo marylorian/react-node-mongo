@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose"
+import { Schema, model } from "mongoose";
 
 const leaderSchema = new Schema(
 	{
@@ -30,6 +30,6 @@ const leaderSchema = new Schema(
 	{
 		timestamps: true,
 	},
-)
+);
 
-export default model("Leader", leaderSchema)
+export default model("Leader", leaderSchema);

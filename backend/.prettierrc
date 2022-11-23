@@ -3,6 +3,6 @@
 	"trailingComma": "all",
 	"tabWidth": 4,
 	"useTabs": true,
-	"semi": false,
+	"semi": true,
 	"singleQuote": false
 }

@@ -20,3 +20,4 @@ package.json
 package-lock.json
 prettierrc.config.json
 sessions
+confusionServer

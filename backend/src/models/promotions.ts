@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose"
+import { Schema, model } from "mongoose";
 
 const promotionSchema = new Schema(
 	{
@@ -31,6 +31,6 @@ const promotionSchema = new Schema(
 	{
 		timestamps: true,
 	},
-)
+);
 
-export default model("Promotion", promotionSchema)
+export default model("Promotion", promotionSchema);

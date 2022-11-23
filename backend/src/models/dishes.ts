@@ -1,6 +1,6 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-import { commentSchema } from "./comments"
+import { commentSchema } from "./comments";
 
 export const dishSchema = new mongoose.Schema(
 	{
@@ -34,6 +34,6 @@ export const dishSchema = new mongoose.Schema(
 	{
 		timestamps: true,
 	},
-)
+);
 
-export default mongoose.model("Dish", dishSchema)
+export default mongoose.model("Dish", dishSchema);

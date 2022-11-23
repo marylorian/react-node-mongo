@@ -1,12 +1,12 @@
-import HttpStatusCodes from "../constants/HttpStatusCodes"
+import HttpStatusCodes from "../constants/HttpStatusCodes";
 
 /**
  * Error with status code and message
  */
 export class RouteError extends Error {
-	status: HttpStatusCodes
+	status: HttpStatusCodes;
 	constructor(status: HttpStatusCodes, message: string) {
-		super(message)
-		this.status = status
+		super(message);
+		this.status = status;
 	}
 }
