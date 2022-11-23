@@ -7,7 +7,6 @@ import logger from "jet-logger";
 import session from "express-session";
 import sessionFileStore from "session-file-store";
 
-import { HttpCode } from "./constants/httpCodes";
 import { Environments } from "./constants/environments";
 import { dishRouter } from "./routes/dishRouter";
 import { promoRouter } from "./routes/promoRouter";
@@ -15,6 +14,7 @@ import { leaderRouter } from "./routes/leaderRouter";
 import { indexRouter } from "./routes/indexRouter";
 import { basicAuth } from "./middlewares/auth";
 import { userRouter } from "./routes/userRouter";
+import HttpStatusCodes from "./constants/HttpStatusCodes";
 
 dotenv.config();
 
@@ -64,7 +64,7 @@ app.use("/leaders", leaderRouter);
 app.use((err, req, res, next) => {
   logger.err(err, true);
   return res
-    .status(err.status || HttpCode.InternalError)
+    .status(err.status || HttpStatusCodes.INTERNAL_SERVER_ERROR)
     .json({ error: err.message });
 });
 

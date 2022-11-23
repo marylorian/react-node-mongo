@@ -1,6 +1,6 @@
 import express from "express";
+import HttpStatusCodes from "../constants/HttpStatusCodes";
 
-import { HttpCode } from "../constants/httpCodes";
 import Dishes from "../models/dishes";
 
 const dishRouter = express.Router();
@@ -11,7 +11,7 @@ dishRouter
     try {
       const dishes = await Dishes.find({});
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(dishes);
     } catch (err) {
@@ -25,7 +25,7 @@ dishRouter
 
       const dish = await Dishes.create({ name, description });
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(dish);
     } catch (err) {
@@ -40,7 +40,7 @@ dishRouter
     try {
       const response = await Dishes.remove({});
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(response);
     } catch (err) {
@@ -57,13 +57,13 @@ dishRouter
       const dish = await Dishes.findById(dishId);
 
       if (!dish) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Dish ${dishId} was not found`);
       }
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(dish);
     } catch (err) {
@@ -86,7 +86,7 @@ dishRouter
         { new: true }
       );
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(dish);
     } catch (err) {
@@ -99,7 +99,7 @@ dishRouter
       const { dishId } = req.params;
       const dish = await Dishes.findByIdAndRemove(dishId);
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(dish);
     } catch (err) {
@@ -116,13 +116,13 @@ dishRouter
       const dish = await Dishes.findById(dishId);
 
       if (!dish) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Dish ${dishId} was not found`);
       }
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(dish.comments);
     } catch (err) {
@@ -132,7 +132,7 @@ dishRouter
   })
   .post((req, res, next) => {
     const { dishId } = req.params;
-    res.statusCode = HttpCode.BadRequest;
+    res.statusCode = HttpStatusCodes.BAD_REQUEST;
     res.send(`POST dish ${dishId}/comments is not implemented`);
   })
   .put(async (req, res, next) => {
@@ -141,7 +141,7 @@ dishRouter
       const dish = await Dishes.findById(dishId);
 
       if (!dish) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Dish ${dishId} was not found`);
@@ -157,7 +157,7 @@ dishRouter
 
       const updatedDish = await dish.save();
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(updatedDish);
     } catch (err) {
@@ -171,7 +171,7 @@ dishRouter
       const dish = await Dishes.findById(dishId);
 
       if (!dish) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Dish ${dishId} was not found`);
@@ -181,7 +181,7 @@ dishRouter
 
       const updatedDish = await dish.save();
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(updatedDish);
     } catch (err) {
@@ -198,7 +198,7 @@ dishRouter
       const dish = await Dishes.findById(dishId);
 
       if (!dish) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Dish ${dishId} was not found`);
@@ -207,13 +207,13 @@ dishRouter
       const comment = dish.comments.id(commentId);
 
       if (!comment) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Comment ${commentId} was not found`);
       }
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(comment);
     } catch (err) {
@@ -223,7 +223,7 @@ dishRouter
   })
   .post((req, res, next) => {
     const { dishId, commentId } = req.params;
-    res.statusCode = HttpCode.BadRequest;
+    res.statusCode = HttpStatusCodes.BAD_REQUEST;
     res.send(`POST ${dishId}/comments/${commentId} is not implemented`);
   })
   .put(async (req, res, next) => {
@@ -232,7 +232,7 @@ dishRouter
       const dish = await Dishes.findById(dishId);
 
       if (!dish) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Dish ${dishId} was not found`);
@@ -241,7 +241,7 @@ dishRouter
       const comment = dish.comments.id(commentId);
 
       if (!comment) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Comment ${commentId} was not found`);
@@ -254,7 +254,7 @@ dishRouter
 
       const updatedDish = await dish.save();
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(updatedDish);
     } catch (err) {
@@ -268,7 +268,7 @@ dishRouter
       const dish = await Dishes.findById(dishId);
 
       if (!dish) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Dish ${dishId} was not found`);
@@ -277,7 +277,7 @@ dishRouter
       const comment = dish.comments.id(commentId);
 
       if (!comment) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Comment ${commentId} was not found`);
@@ -287,7 +287,7 @@ dishRouter
 
       const updatedDish = await dish.save();
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(updatedDish);
     } catch (err) {

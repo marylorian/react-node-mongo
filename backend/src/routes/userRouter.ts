@@ -1,6 +1,6 @@
 import express from "express";
 
-import { HttpCode } from "../constants/httpCodes";
+import HttpStatusCodes from "../constants/HttpStatusCodes";
 import { basicAuth } from "../middlewares/auth";
 import Users from "../models/user";
 import { RouteError } from "../types/RouteError";
@@ -8,7 +8,7 @@ import { RouteError } from "../types/RouteError";
 const userRouter = express.Router();
 
 userRouter.get("/", (req, res, next) => {
-  res.status(HttpCode.BadRequest);
+  res.status(HttpStatusCodes.BAD_REQUEST);
   res.send("GET user/ not implemented yet");
 });
 
@@ -17,13 +17,16 @@ userRouter.post("/signup", async (req, res, next) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      throw new RouteError(HttpCode.BadRequest, "Incorrect Data");
+      throw new RouteError(HttpStatusCodes.BAD_REQUEST, "Incorrect Data");
     }
 
     const user = await Users.findOne({ username });
 
     if (user) {
-      throw new RouteError(HttpCode.Forbidden, "Username already in use");
+      throw new RouteError(
+        HttpStatusCodes.FORBIDDEN,
+        "Username already in use"
+      );
     }
 
     await Users.create({
@@ -32,7 +35,7 @@ userRouter.post("/signup", async (req, res, next) => {
     });
 
     res.setHeader("Content-Type", "application/json");
-    res.status(HttpCode.Success);
+    res.status(HttpStatusCodes.OK);
     return res.json({ status: "registration successful" });
   } catch (err) {
     next(err);
@@ -42,7 +45,7 @@ userRouter.post("/signup", async (req, res, next) => {
 userRouter.get("/login", basicAuth, async (req, res, next) => {
   try {
     res.setHeader("Content-Type", "application/json");
-    res.status(HttpCode.Success);
+    res.status(HttpStatusCodes.OK);
     return res.json({ status: `login ${req.body.username} successful` });
   } catch (err) {
     next(err);
@@ -52,7 +55,7 @@ userRouter.get("/login", basicAuth, async (req, res, next) => {
 userRouter.get("/logout", async (req, res, next) => {
   try {
     if (!req.session) {
-      throw new RouteError(HttpCode.NotFound, "You are not logged in");
+      throw new RouteError(HttpStatusCodes.NOT_FOUND, "You are not logged in");
     }
 
     req.session.destroy((err) => {

@@ -1,6 +1,6 @@
 import express from "express";
 
-import { HttpCode } from "../constants/httpCodes";
+import HttpStatusCodes from "../constants/HttpStatusCodes";
 import Promotions from "../models/promotions";
 
 const promoRouter = express.Router();
@@ -11,7 +11,7 @@ promoRouter
     try {
       const promos = await Promotions.find({});
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(promos);
     } catch (err) {
@@ -20,7 +20,7 @@ promoRouter
     }
   })
   .post((req, res, next) => {
-    res.statusCode = HttpCode.BadRequest;
+    res.statusCode = HttpStatusCodes.BAD_REQUEST;
     res.send(`POST all promotions not implemented yet`);
   })
   .put(async (req, res, next) => {
@@ -36,7 +36,7 @@ promoRouter
         featured,
       });
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(promos);
     } catch (err) {
@@ -48,7 +48,7 @@ promoRouter
     try {
       const response = await Promotions.remove({});
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(response);
     } catch (err) {
@@ -66,13 +66,13 @@ promoRouter
       const promo = await Promotions.findById(promoId);
 
       if (!promo) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Promotion ${promoId} was not found`);
       }
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(promo);
     } catch (err) {
@@ -94,7 +94,7 @@ promoRouter
         { new: true }
       );
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(promo);
     } catch (err) {
@@ -108,7 +108,7 @@ promoRouter
 
       const response = await Promotions.findByIdAndRemove(promoId);
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(response);
     } catch (err) {

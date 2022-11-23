@@ -1,6 +1,6 @@
 import express from "express";
 
-import { HttpCode } from "../constants/httpCodes";
+import HttpStatusCodes from "../constants/HttpStatusCodes";
 import Leaders from "../models/leaders";
 
 const leaderRouter = express.Router();
@@ -11,7 +11,7 @@ leaderRouter
     try {
       const leaders = await Leaders.find({});
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(leaders);
     } catch (err) {
@@ -20,7 +20,7 @@ leaderRouter
     }
   })
   .post((req, res, next) => {
-    res.statusCode = HttpCode.BadRequest;
+    res.statusCode = HttpStatusCodes.BAD_REQUEST;
     res.send(`POST all leaders not implemented yet`);
   })
   .put(async (req, res, next) => {
@@ -37,7 +37,7 @@ leaderRouter
         featured,
       });
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(leaders);
     } catch (err) {
@@ -49,7 +49,7 @@ leaderRouter
     try {
       const response = await Leaders.remove({});
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(response);
     } catch (err) {
@@ -67,13 +67,13 @@ leaderRouter
       const leader = await Leaders.findById(leaderId);
 
       if (!leader) {
-        res.statusCode = HttpCode.NotFound;
+        res.statusCode = HttpStatusCodes.NOT_FOUND;
         res.setHeader("Content-Type", "application/json");
 
         throw Error(`Leader ${leaderId} was not found`);
       }
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(leader);
     } catch (err) {
@@ -95,7 +95,7 @@ leaderRouter
         { new: true }
       );
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(leader);
     } catch (err) {
@@ -109,7 +109,7 @@ leaderRouter
 
       const response = await Leaders.findByIdAndRemove(leaderId);
 
-      res.statusCode = HttpCode.Success;
+      res.statusCode = HttpStatusCodes.OK;
       res.setHeader("Content-Type", "application/json");
       res.json(response);
     } catch (err) {
