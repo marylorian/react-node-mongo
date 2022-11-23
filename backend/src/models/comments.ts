@@ -1,8 +1,8 @@
-import { Document, Schema, model, Model } from "mongoose";
+import { Document, Schema, model, Model, Types } from "mongoose";
 
 export interface Comment {
 	rating: number;
-	author: string;
+	author: Types.ObjectId;
 	comment?: string;
 }
 
@@ -21,8 +21,8 @@ export const commentSchema = new Schema<CommentDocument>(
 			required: true,
 		},
 		author: {
-			type: String,
-			required: true,
+			type: Schema.Types.ObjectId,
+			ref: "User",
 		},
 	},
 	{

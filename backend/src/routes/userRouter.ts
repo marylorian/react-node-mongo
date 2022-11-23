@@ -13,6 +13,29 @@ userRouter.get("/", (req, res, next) => {
 	res.send("GET user/ not implemented yet");
 });
 
+userRouter.get(
+	"/users",
+	PassportAuthService.verifyUser,
+	PassportAuthService.verifyAdmin,
+	async (req, res, next) => {
+		try {
+			const users = await Users.find({});
+
+			if (!users) {
+				throw new RouteError(
+					HttpStatusCodes.INTERNAL_SERVER_ERROR,
+					"Cannot retrieve users",
+				);
+			}
+
+			res.setHeader("Content-Type", "application/json");
+			res.status(HttpStatusCodes.OK).json(users);
+		} catch (err) {
+			next(err);
+		}
+	},
+);
+
 userRouter.post("/signup", async (req, res, next) => {
 	try {
 		const { username, password } = req.body;
@@ -24,10 +47,30 @@ userRouter.post("/signup", async (req, res, next) => {
 		await Users.register(
 			{ username } as UserDocument,
 			password,
-			(err, account) => {
+			async (err, account) => {
 				if (err) {
 					return next(err);
 				}
+
+				const { firstname, lastname } = req.body;
+				if (firstname) {
+					account.firstname = firstname;
+				}
+				if (lastname) {
+					account.lastname = lastname;
+				}
+
+				const signedUser = await account.save();
+
+				if (!signedUser) {
+					return next(
+						new RouteError(
+							HttpStatusCodes.INTERNAL_SERVER_ERROR,
+							"Cannot save new user",
+						),
+					);
+				}
+
 				passport.authenticate("local", { session: false })(
 					req,
 					res,
@@ -62,25 +105,26 @@ userRouter.get(
 	},
 );
 
-userRouter.get("/logout", async (req, res, next) => {
-	try {
-		if (!req.session) {
-			throw new RouteError(
-				HttpStatusCodes.NOT_FOUND,
-				"You are not logged in",
-			);
-		}
+// userRouter.get("/logout", async (req, res, next) => {
+// 	try {
+//         req.user?.
+// 		if (!req.session) {
+// 			throw new RouteError(
+// 				HttpStatusCodes.NOT_FOUND,
+// 				"You are not logged in",
+// 			);
+// 		}
 
-		req.session.destroy((err) => {
-			if (err) {
-				throw err;
-			}
-			res.clearCookie("session-id");
-			res.redirect("/");
-		});
-	} catch (err) {
-		next(err);
-	}
-});
+// 		req.session.destroy((err) => {
+// 			if (err) {
+// 				throw err;
+// 			}
+// 			res.clearCookie("session-id");
+// 			res.redirect("/");
+// 		});
+// 	} catch (err) {
+// 		next(err);
+// 	}
+// });
 
 export { userRouter };
