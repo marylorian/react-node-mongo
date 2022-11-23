@@ -2,6 +2,7 @@ import express from "express";
 
 import HttpStatusCodes from "../constants/HttpStatusCodes";
 import Promotions from "../models/promotions";
+import * as PassportAuthService from "../services/PassportAuthService/PasportAuthService";
 
 const promoRouter = express.Router();
 
@@ -19,11 +20,11 @@ promoRouter
 			next(err);
 		}
 	})
-	.post((req, res, next) => {
+	.post(PassportAuthService.verifyUser, (req, res, next) => {
 		res.statusCode = HttpStatusCodes.BAD_REQUEST;
 		res.send(`POST all promotions not implemented yet`);
 	})
-	.put(async (req, res, next) => {
+	.put(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { name, image, label, price, description, featured } =
 				req.body;
@@ -45,7 +46,7 @@ promoRouter
 			next(err);
 		}
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const response = await Promotions.remove({});
 
@@ -81,11 +82,11 @@ promoRouter
 			next(err);
 		}
 	})
-	.post((req, res, next) => {
+	.post(PassportAuthService.verifyUser, (req, res, next) => {
 		const { promoId } = req.params;
 		res.send(`POST promotions/${promoId} is not implemented yet`);
 	})
-	.put(async (req, res, next) => {
+	.put(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { promoId } = req.params;
 
@@ -103,7 +104,7 @@ promoRouter
 			next(err);
 		}
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { promoId } = req.params;
 

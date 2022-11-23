@@ -3,6 +3,7 @@ import HttpStatusCodes from "../constants/HttpStatusCodes";
 
 import Dishes from "../models/dishes";
 import { RouteError } from "../types/RouteError";
+import * as PassportAuthService from "../services/PassportAuthService/PasportAuthService";
 
 const dishRouter = express.Router();
 
@@ -20,7 +21,7 @@ dishRouter
 			next(err);
 		}
 	})
-	.post(async (req, res, next) => {
+	.post(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { name, description } = req.body;
 
@@ -34,10 +35,10 @@ dishRouter
 			next(err);
 		}
 	})
-	.put((req, res, next) => {
+	.put(PassportAuthService.verifyUser, (req, res, next) => {
 		res.send(`PUT all dishes`);
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const response = await Dishes.remove({});
 
@@ -72,11 +73,11 @@ dishRouter
 			next(err);
 		}
 	})
-	.post((req, res, next) => {
+	.post(PassportAuthService.verifyUser, (req, res, next) => {
 		const { dishId } = req.params;
 		res.send(`POST dish ${dishId}`);
 	})
-	.put(async (req, res, next) => {
+	.put(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { dishId } = req.params;
 			const { name, description } = req.body;
@@ -95,7 +96,7 @@ dishRouter
 			next(err);
 		}
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { dishId } = req.params;
 			const dish = await Dishes.findByIdAndRemove(dishId);
@@ -131,12 +132,12 @@ dishRouter
 			next(err);
 		}
 	})
-	.post((req, res, next) => {
+	.post(PassportAuthService.verifyUser, (req, res, next) => {
 		const { dishId } = req.params;
 		res.statusCode = HttpStatusCodes.BAD_REQUEST;
 		res.send(`POST dish ${dishId}/comments is not implemented`);
 	})
-	.put(async (req, res, next) => {
+	.put(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { dishId } = req.params;
 			const dish = await Dishes.findById(dishId);
@@ -173,7 +174,7 @@ dishRouter
 			next(err);
 		}
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { dishId } = req.params;
 			const dish = await Dishes.findById(dishId);
@@ -243,12 +244,12 @@ dishRouter
 			next(err);
 		}
 	})
-	.post((req, res, next) => {
+	.post(PassportAuthService.verifyUser, (req, res, next) => {
 		const { dishId, commentId } = req.params;
 		res.statusCode = HttpStatusCodes.BAD_REQUEST;
 		res.send(`POST ${dishId}/comments/${commentId} is not implemented`);
 	})
-	.put(async (req, res, next) => {
+	.put(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { dishId, commentId } = req.params;
 			const dish = await Dishes.findById(dishId);
@@ -291,7 +292,7 @@ dishRouter
 			next(err);
 		}
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { dishId, commentId } = req.params;
 			const dish = await Dishes.findById(dishId);

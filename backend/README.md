@@ -29,3 +29,14 @@ Check for prettier errors.
 
 Fixes prettier errors, make code to align prettier rules.
 
+## Initial configuration
+
+1. `npm install`
+2. set following variables to .env file
+
+NODE_ENV=development
+PORT=8080
+SECRET=<your secret>
+DB_URL=<your DB URL>
+
+3. `npm run start`

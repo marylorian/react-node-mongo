@@ -2,6 +2,7 @@ import express from "express";
 
 import HttpStatusCodes from "../constants/HttpStatusCodes";
 import Leaders from "../models/leaders";
+import * as PassportAuthService from "../services/PassportAuthService/PasportAuthService";
 
 const leaderRouter = express.Router();
 
@@ -19,11 +20,11 @@ leaderRouter
 			next(err);
 		}
 	})
-	.post((req, res, next) => {
+	.post(PassportAuthService.verifyUser, (req, res, next) => {
 		res.statusCode = HttpStatusCodes.BAD_REQUEST;
 		res.send(`POST all leaders not implemented yet`);
 	})
-	.put(async (req, res, next) => {
+	.put(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { name, image, designation, abbr, description, featured } =
 				req.body;
@@ -45,7 +46,7 @@ leaderRouter
 			next(err);
 		}
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const response = await Leaders.remove({});
 
@@ -81,11 +82,11 @@ leaderRouter
 			next(err);
 		}
 	})
-	.post((req, res, next) => {
+	.post(PassportAuthService.verifyUser, (req, res, next) => {
 		const { leaderId } = req.params;
 		res.send(`POST leaders/${leaderId} is not implemented yet`);
 	})
-	.put(async (req, res, next) => {
+	.put(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { leaderId } = req.params;
 
@@ -103,7 +104,7 @@ leaderRouter
 			next(err);
 		}
 	})
-	.delete(async (req, res, next) => {
+	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
 		try {
 			const { leaderId } = req.params;
 

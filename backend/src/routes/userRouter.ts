@@ -4,6 +4,7 @@ import passport from "passport";
 import HttpStatusCodes from "../constants/HttpStatusCodes";
 import Users, { UserDocument } from "../models/user";
 import { RouteError } from "../types/RouteError";
+import * as PassportAuthService from "../services/PassportAuthService/PasportAuthService";
 
 const userRouter = express.Router();
 
@@ -27,14 +28,18 @@ userRouter.post("/signup", async (req, res, next) => {
 				if (err) {
 					return next(err);
 				}
-				passport.authenticate("local")(req, res, () => {
-					res.status(HttpStatusCodes.OK);
-					res.setHeader("Content-Type", "application/json");
-					return res.json({
-						sucess: true,
-						status: "registration successful",
-					});
-				});
+				passport.authenticate("local", { session: false })(
+					req,
+					res,
+					() => {
+						res.status(HttpStatusCodes.OK);
+						res.setHeader("Content-Type", "application/json");
+						return res.json({
+							sucess: true,
+							status: "registration successful",
+						});
+					},
+				);
 			},
 		);
 	} catch (err) {
@@ -44,11 +49,16 @@ userRouter.post("/signup", async (req, res, next) => {
 
 userRouter.get(
 	"/login",
-	passport.authenticate("local"),
+	passport.authenticate("local", { session: false }),
 	async (req, res, next) => {
+		const token = PassportAuthService.getToken({ _id: req.user?._id });
+
 		res.setHeader("Content-Type", "application/json");
 		res.status(HttpStatusCodes.OK);
-		return res.json({ status: `login ${req.body.username} successful` });
+		return res.json({
+			token,
+			status: `login ${req.body.username} successful`,
+		});
 	},
 );
 
