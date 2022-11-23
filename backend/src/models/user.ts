@@ -1,19 +1,20 @@
-import { Schema, model } from "mongoose";
+import { Document, Schema, model, PassportLocalModel } from "mongoose";
+import PassportLocal from "passport-local-mongoose";
 
-const userSchema = new Schema({
-	username: {
-		type: String,
-		required: true,
-		unique: true,
-	},
-	password: {
-		type: String,
-		required: true,
-	},
+export interface UserDocument extends Document {
+	admin?: boolean;
+	username: string;
+}
+
+const userSchema = new Schema<UserDocument>({
 	admin: {
 		type: Boolean,
 		default: false,
 	},
 });
 
-export default model("User", userSchema);
+userSchema.plugin(PassportLocal);
+
+interface UserModel extends PassportLocalModel<UserDocument> {}
+
+export default model<UserDocument, UserModel>("User", userSchema);

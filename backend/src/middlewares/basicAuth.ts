@@ -24,6 +24,8 @@ export const basicAuth = async (req, res, next) => {
 					);
 				}
 
+				// file is not in use
+				// @ts-ignore
 				if (user.password !== password) {
 					throw new RouteError(
 						HttpStatusCodes.UNAUTHORIZED,
@@ -46,6 +48,8 @@ export const basicAuth = async (req, res, next) => {
 				);
 			}
 
+			// file is not in use
+			// @ts-ignore
 			if (user.password !== password) {
 				throw new RouteError(
 					HttpStatusCodes.UNAUTHORIZED,

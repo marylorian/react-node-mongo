@@ -6,15 +6,16 @@ import morgan from "morgan";
 import logger from "jet-logger";
 import session from "express-session";
 import sessionFileStore from "session-file-store";
+import passport from "passport";
 
 import { Environments } from "./constants/environments";
+import HttpStatusCodes from "./constants/HttpStatusCodes";
 import { dishRouter } from "./routes/dishRouter";
 import { promoRouter } from "./routes/promoRouter";
 import { leaderRouter } from "./routes/leaderRouter";
 import { indexRouter } from "./routes/indexRouter";
-import { basicAuth } from "./middlewares/auth";
 import { userRouter } from "./routes/userRouter";
-import HttpStatusCodes from "./constants/HttpStatusCodes";
+import { passportAuth } from "./middlewares/passportAuth";
 
 dotenv.config();
 
@@ -37,7 +38,10 @@ app.use(
 		name: "session-id",
 		secret: "12345-67890-09876-54321",
 		resave: false,
-		store: new FileStore({}),
+		saveUninitialized: false,
+		store: new FileStore({
+			path: "./sessions/",
+		}),
 	}),
 );
 
@@ -51,10 +55,14 @@ if (process.env.NODE_ENV === Environments.Prod) {
 	app.use(helmet());
 }
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/", indexRouter);
 app.use("/auth", userRouter);
 
-app.use(basicAuth);
+import "./services/PassportAuthService/PasportAuthService";
+app.use(passportAuth);
 
 app.use("/dishes", dishRouter);
 app.use("/promotions", promoRouter);

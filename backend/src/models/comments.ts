@@ -1,6 +1,14 @@
-import mongoose from "mongoose";
+import { Document, Schema, model, Model } from "mongoose";
 
-export const commentSchema = new mongoose.Schema(
+export interface Comment {
+	rating: number;
+	author: string;
+	comment?: string;
+}
+
+export interface CommentDocument extends Document, Comment {}
+
+export const commentSchema = new Schema<CommentDocument>(
 	{
 		rating: {
 			type: Number,
@@ -22,4 +30,7 @@ export const commentSchema = new mongoose.Schema(
 	},
 );
 
-export default mongoose.model("Comment", commentSchema);
+export default model<CommentDocument, Model<CommentDocument>>(
+	"Comment",
+	commentSchema,
+);

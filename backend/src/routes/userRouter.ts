@@ -1,8 +1,8 @@
 import express from "express";
+import passport from "passport";
 
 import HttpStatusCodes from "../constants/HttpStatusCodes";
-import { basicAuth } from "../middlewares/auth";
-import Users from "../models/user";
+import Users, { UserDocument } from "../models/user";
 import { RouteError } from "../types/RouteError";
 
 const userRouter = express.Router();
@@ -20,37 +20,37 @@ userRouter.post("/signup", async (req, res, next) => {
 			throw new RouteError(HttpStatusCodes.BAD_REQUEST, "Incorrect Data");
 		}
 
-		const user = await Users.findOne({ username });
-
-		if (user) {
-			throw new RouteError(
-				HttpStatusCodes.FORBIDDEN,
-				"Username already in use",
-			);
-		}
-
-		await Users.create({
-			username,
+		await Users.register(
+			{ username } as UserDocument,
 			password,
-		});
-
-		res.setHeader("Content-Type", "application/json");
-		res.status(HttpStatusCodes.OK);
-		return res.json({ status: "registration successful" });
+			(err, account) => {
+				if (err) {
+					return next(err);
+				}
+				passport.authenticate("local")(req, res, () => {
+					res.status(HttpStatusCodes.OK);
+					res.setHeader("Content-Type", "application/json");
+					return res.json({
+						sucess: true,
+						status: "registration successful",
+					});
+				});
+			},
+		);
 	} catch (err) {
 		next(err);
 	}
 });
 
-userRouter.get("/login", basicAuth, async (req, res, next) => {
-	try {
+userRouter.get(
+	"/login",
+	passport.authenticate("local"),
+	async (req, res, next) => {
 		res.setHeader("Content-Type", "application/json");
 		res.status(HttpStatusCodes.OK);
 		return res.json({ status: `login ${req.body.username} successful` });
-	} catch (err) {
-		next(err);
-	}
-});
+	},
+);
 
 userRouter.get("/logout", async (req, res, next) => {
 	try {

@@ -1,8 +1,18 @@
-import mongoose from "mongoose";
+import { Document, Schema, model, Model, Types } from "mongoose";
 
-import { commentSchema } from "./comments";
+import { commentSchema, Comment } from "./comments";
 
-export const dishSchema = new mongoose.Schema(
+interface DishDocument extends Document {
+	name: string;
+	description: string;
+	category?: string;
+	label?: string;
+	price?: number;
+	image?: string;
+	comments?: Types.DocumentArray<Comment>;
+}
+
+export const dishSchema = new Schema<DishDocument>(
 	{
 		name: {
 			type: String,
@@ -24,6 +34,7 @@ export const dishSchema = new mongoose.Schema(
 		price: {
 			type: Number,
 			default: 0,
+			min: 0,
 		},
 		image: {
 			type: String,
@@ -36,4 +47,4 @@ export const dishSchema = new mongoose.Schema(
 	},
 );
 
-export default mongoose.model("Dish", dishSchema);
+export default model<DishDocument, Model<DishDocument>>("Dish", dishSchema);

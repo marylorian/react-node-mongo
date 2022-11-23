@@ -2,6 +2,7 @@ import express from "express";
 import HttpStatusCodes from "../constants/HttpStatusCodes";
 
 import Dishes from "../models/dishes";
+import { RouteError } from "../types/RouteError";
 
 const dishRouter = express.Router();
 
@@ -149,6 +150,13 @@ dishRouter
 
 			const { rating, author, comment } = req.body;
 
+			if (!dish.comments) {
+				throw new RouteError(
+					HttpStatusCodes.INTERNAL_SERVER_ERROR,
+					"Dish has no comments to add new one",
+				);
+			}
+
 			dish.comments.push({
 				rating,
 				author,
@@ -177,6 +185,13 @@ dishRouter
 				throw Error(`Dish ${dishId} was not found`);
 			}
 
+			if (!dish.comments) {
+				throw new RouteError(
+					HttpStatusCodes.INTERNAL_SERVER_ERROR,
+					"Dish has no comments to remove this one",
+				);
+			}
+
 			dish.comments.remove({});
 
 			const updatedDish = await dish.save();
@@ -202,6 +217,13 @@ dishRouter
 				res.setHeader("Content-Type", "application/json");
 
 				throw Error(`Dish ${dishId} was not found`);
+			}
+
+			if (!dish.comments) {
+				throw new RouteError(
+					HttpStatusCodes.INTERNAL_SERVER_ERROR,
+					"Dish has no comments to get this one",
+				);
 			}
 
 			const comment = dish.comments.id(commentId);
@@ -238,6 +260,13 @@ dishRouter
 				throw Error(`Dish ${dishId} was not found`);
 			}
 
+			if (!dish.comments) {
+				throw new RouteError(
+					HttpStatusCodes.INTERNAL_SERVER_ERROR,
+					"Dish has no comments to get this one",
+				);
+			}
+
 			const comment = dish.comments.id(commentId);
 
 			if (!comment) {
@@ -272,6 +301,13 @@ dishRouter
 				res.setHeader("Content-Type", "application/json");
 
 				throw Error(`Dish ${dishId} was not found`);
+			}
+
+			if (!dish.comments) {
+				throw new RouteError(
+					HttpStatusCodes.INTERNAL_SERVER_ERROR,
+					"Dish has no comments to get this one",
+				);
 			}
 
 			const comment = dish.comments.id(commentId);
