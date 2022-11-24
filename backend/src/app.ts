@@ -14,6 +14,7 @@ import { leaderRouter } from "./routes/leaderRouter";
 import { indexRouter } from "./routes/indexRouter";
 import { userRouter } from "./routes/userRouter";
 import { uploadRouter } from "./routes/uploadRouter";
+import { favoritesRouter } from "./routes/favoriteRouter";
 
 const app = express();
 
@@ -55,6 +56,7 @@ app.use("/dishes", dishRouter);
 app.use("/promotions", promoRouter);
 app.use("/leaders", leaderRouter);
 app.use("/image-upload", uploadRouter);
+app.use("/favorites", favoritesRouter);
 
 // error handler
 app.use((err, req, res, next) => {

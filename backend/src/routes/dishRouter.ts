@@ -1,6 +1,6 @@
 import express from "express";
-import HttpStatusCodes from "../constants/HttpStatusCodes";
 
+import HttpStatusCodes from "../constants/HttpStatusCodes";
 import Dishes from "../models/dishes";
 import { RouteError } from "../types/RouteError";
 import * as PassportAuthService from "../services/PassportAuthService/PasportAuthService";

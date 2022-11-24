@@ -2,7 +2,7 @@ import { Document, Schema, model, Model, Types } from "mongoose";
 
 import { commentSchema, Comment } from "./comments";
 
-interface DishDocument extends Document {
+export interface DishDocument extends Document {
 	name: string;
 	description: string;
 	category?: string;

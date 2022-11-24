@@ -10,7 +10,7 @@ promoRouter
 	.route("/")
 	.get(async (req, res, next) => {
 		try {
-			const promos = await Promotions.find({});
+			const promos = await Promotions.find(req.query);
 
 			res.statusCode = HttpStatusCodes.OK;
 			res.setHeader("Content-Type", "application/json");
