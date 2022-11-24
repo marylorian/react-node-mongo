@@ -13,9 +13,11 @@ import { promoRouter } from "./routes/promoRouter";
 import { leaderRouter } from "./routes/leaderRouter";
 import { indexRouter } from "./routes/indexRouter";
 import { userRouter } from "./routes/userRouter";
+import { uploadRouter } from "./routes/uploadRouter";
 
 const app = express();
 
+// https
 app.all("*", (req, res, next) => {
 	if (req.secure) {
 		return next();
@@ -52,6 +54,7 @@ app.use("/auth", userRouter);
 app.use("/dishes", dishRouter);
 app.use("/promotions", promoRouter);
 app.use("/leaders", leaderRouter);
+app.use("/image-upload", uploadRouter);
 
 // error handler
 app.use((err, req, res, next) => {
