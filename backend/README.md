@@ -38,6 +38,7 @@ NODE_ENV=development
 PORT=8080
 SECRET=<your secret>
 DB_URL=<your DB URL>
+ORIGINS_WHITELIST=http://localhost:8080/,https://localhost:8443/
 
 3. `npm run start`
 

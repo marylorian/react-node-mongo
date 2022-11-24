@@ -4,12 +4,16 @@ import HttpStatusCodes from "../constants/HttpStatusCodes";
 import Dishes from "../models/dishes";
 import { RouteError } from "../types/RouteError";
 import * as PassportAuthService from "../services/PassportAuthService/PasportAuthService";
+import { cors, corsWithOptions } from "../middlewares/cors";
 
 const dishRouter = express.Router();
 
 dishRouter
 	.route("/")
-	.get(async (req, res, next) => {
+	.options(corsWithOptions, (req, res) => {
+		res.status(HttpStatusCodes.OK);
+	})
+	.get(cors, async (req, res, next) => {
 		try {
 			const dishes = await Dishes.find({}).populate("comments.author");
 
@@ -22,6 +26,7 @@ dishRouter
 		}
 	})
 	.post(
+		corsWithOptions,
 		PassportAuthService.verifyUser,
 		PassportAuthService.verifyAdmin,
 		async (req, res, next) => {
@@ -40,6 +45,7 @@ dishRouter
 		},
 	)
 	.put(
+		corsWithOptions,
 		PassportAuthService.verifyUser,
 		PassportAuthService.verifyAdmin,
 		(req, res, next) => {
@@ -47,6 +53,7 @@ dishRouter
 		},
 	)
 	.delete(
+		corsWithOptions,
 		PassportAuthService.verifyUser,
 		PassportAuthService.verifyAdmin,
 		async (req, res, next) => {
@@ -65,7 +72,10 @@ dishRouter
 
 dishRouter
 	.route("/:dishId")
-	.get(async (req, res, next) => {
+	.options(corsWithOptions, (req, res) => {
+		res.status(HttpStatusCodes.OK);
+	})
+	.get(cors, async (req, res, next) => {
 		try {
 			const { dishId } = req.params;
 			const dish = await Dishes.findById(dishId).populate(
@@ -88,6 +98,7 @@ dishRouter
 		}
 	})
 	.post(
+		corsWithOptions,
 		PassportAuthService.verifyUser,
 		PassportAuthService.verifyAdmin,
 		(req, res, next) => {
@@ -96,6 +107,7 @@ dishRouter
 		},
 	)
 	.put(
+		corsWithOptions,
 		PassportAuthService.verifyUser,
 		PassportAuthService.verifyAdmin,
 		async (req, res, next) => {
@@ -119,6 +131,7 @@ dishRouter
 		},
 	)
 	.delete(
+		corsWithOptions,
 		PassportAuthService.verifyUser,
 		PassportAuthService.verifyAdmin,
 		async (req, res, next) => {
@@ -138,7 +151,10 @@ dishRouter
 
 dishRouter
 	.route("/:dishId/comments")
-	.get(async (req, res, next) => {
+	.options(corsWithOptions, (req, res) => {
+		res.status(HttpStatusCodes.OK);
+	})
+	.get(cors, async (req, res, next) => {
 		try {
 			const { dishId } = req.params;
 			const dish = await Dishes.findById(dishId).populate(
@@ -160,54 +176,59 @@ dishRouter
 			next(err);
 		}
 	})
-	.post(PassportAuthService.verifyUser, (req, res, next) => {
+	.post(corsWithOptions, PassportAuthService.verifyUser, (req, res, next) => {
 		const { dishId } = req.params;
 		res.statusCode = HttpStatusCodes.BAD_REQUEST;
 		res.send(`POST dish ${dishId}/comments is not implemented`);
 	})
-	.put(PassportAuthService.verifyUser, async (req, res, next) => {
-		try {
-			const { dishId } = req.params;
-			const dish = await Dishes.findById(dishId).populate(
-				"comments.author",
-			);
-
-			if (!dish) {
-				res.statusCode = HttpStatusCodes.NOT_FOUND;
-				res.setHeader("Content-Type", "application/json");
-
-				throw Error(`Dish ${dishId} was not found`);
-			}
-
-			const { rating, comment } = req.body;
-
-			if (!dish.comments) {
-				throw new RouteError(
-					HttpStatusCodes.INTERNAL_SERVER_ERROR,
-					"Dish has no comments to add new one",
+	.put(
+		corsWithOptions,
+		PassportAuthService.verifyUser,
+		async (req, res, next) => {
+			try {
+				const { dishId } = req.params;
+				const dish = await Dishes.findById(dishId).populate(
+					"comments.author",
 				);
+
+				if (!dish) {
+					res.statusCode = HttpStatusCodes.NOT_FOUND;
+					res.setHeader("Content-Type", "application/json");
+
+					throw Error(`Dish ${dishId} was not found`);
+				}
+
+				const { rating, comment } = req.body;
+
+				if (!dish.comments) {
+					throw new RouteError(
+						HttpStatusCodes.INTERNAL_SERVER_ERROR,
+						"Dish has no comments to add new one",
+					);
+				}
+
+				dish.comments.push({
+					rating,
+					author: req.user?._id,
+					comment,
+				});
+
+				await dish.save();
+				const updatedDish = await Dishes.findById(dishId).populate(
+					"comments.author",
+				);
+
+				res.statusCode = HttpStatusCodes.OK;
+				res.setHeader("Content-Type", "application/json");
+				res.json(updatedDish);
+			} catch (err) {
+				console.error(err);
+				next(err);
 			}
-
-			dish.comments.push({
-				rating,
-				author: req.user?._id,
-				comment,
-			});
-
-			await dish.save();
-			const updatedDish = await Dishes.findById(dishId).populate(
-				"comments.author",
-			);
-
-			res.statusCode = HttpStatusCodes.OK;
-			res.setHeader("Content-Type", "application/json");
-			res.json(updatedDish);
-		} catch (err) {
-			console.error(err);
-			next(err);
-		}
-	})
+		},
+	)
 	.delete(
+		corsWithOptions,
 		PassportAuthService.verifyUser,
 		PassportAuthService.verifyAdmin,
 		async (req, res, next) => {
@@ -245,7 +266,10 @@ dishRouter
 
 dishRouter
 	.route("/:dishId/comments/:commentId")
-	.get(async (req, res, next) => {
+	.options(corsWithOptions, (req, res) => {
+		res.status(HttpStatusCodes.OK);
+	})
+	.get(cors, async (req, res, next) => {
 		try {
 			const { dishId, commentId } = req.params;
 			const dish = await Dishes.findById(dishId).populate(
@@ -283,125 +307,133 @@ dishRouter
 			next(err);
 		}
 	})
-	.post(PassportAuthService.verifyUser, (req, res, next) => {
+	.post(corsWithOptions, PassportAuthService.verifyUser, (req, res, next) => {
 		const { dishId, commentId } = req.params;
 		res.statusCode = HttpStatusCodes.BAD_REQUEST;
 		res.send(`POST ${dishId}/comments/${commentId} is not implemented`);
 	})
-	.put(PassportAuthService.verifyUser, async (req, res, next) => {
-		try {
-			if (!req.user) {
-				throw new RouteError(
-					HttpStatusCodes.UNAUTHORIZED,
-					"You are not authorize",
+	.put(
+		corsWithOptions,
+		PassportAuthService.verifyUser,
+		async (req, res, next) => {
+			try {
+				if (!req.user) {
+					throw new RouteError(
+						HttpStatusCodes.UNAUTHORIZED,
+						"You are not authorize",
+					);
+				}
+
+				const { dishId, commentId } = req.params;
+				const dish = await Dishes.findById(dishId);
+
+				if (!dish) {
+					res.statusCode = HttpStatusCodes.NOT_FOUND;
+					res.setHeader("Content-Type", "application/json");
+
+					throw Error(`Dish ${dishId} was not found`);
+				}
+
+				if (!dish.comments) {
+					throw new RouteError(
+						HttpStatusCodes.INTERNAL_SERVER_ERROR,
+						"Dish has no comments to get this one",
+					);
+				}
+
+				const comment = dish.comments.id(commentId);
+
+				if (!comment) {
+					res.statusCode = HttpStatusCodes.NOT_FOUND;
+					res.setHeader("Content-Type", "application/json");
+
+					throw Error(`Comment ${commentId} was not found`);
+				}
+
+				if (!comment.author.equals(req.user._id)) {
+					throw new RouteError(
+						HttpStatusCodes.FORBIDDEN,
+						"You have no permissions to change this comment",
+					);
+				}
+
+				const { rating, comment: commentText } = req.body;
+
+				rating && comment.set({ rating });
+				commentText && comment.set({ comment: commentText });
+				req.user._id && comment.set({ author: req.user._id });
+
+				await dish.save();
+				const updatedDish = await Dishes.findById(dishId).populate(
+					"comments.author",
 				);
-			}
 
-			const { dishId, commentId } = req.params;
-			const dish = await Dishes.findById(dishId);
-
-			if (!dish) {
-				res.statusCode = HttpStatusCodes.NOT_FOUND;
+				res.statusCode = HttpStatusCodes.OK;
 				res.setHeader("Content-Type", "application/json");
-
-				throw Error(`Dish ${dishId} was not found`);
+				res.json(updatedDish);
+			} catch (err) {
+				console.error(err);
+				next(err);
 			}
+		},
+	)
+	.delete(
+		corsWithOptions,
+		PassportAuthService.verifyUser,
+		async (req, res, next) => {
+			try {
+				if (!req.user) {
+					throw new RouteError(
+						HttpStatusCodes.UNAUTHORIZED,
+						"You are not authorize",
+					);
+				}
 
-			if (!dish.comments) {
-				throw new RouteError(
-					HttpStatusCodes.INTERNAL_SERVER_ERROR,
-					"Dish has no comments to get this one",
-				);
-			}
+				const { dishId, commentId } = req.params;
+				const dish = await Dishes.findById(dishId);
 
-			const comment = dish.comments.id(commentId);
+				if (!dish) {
+					res.statusCode = HttpStatusCodes.NOT_FOUND;
+					res.setHeader("Content-Type", "application/json");
 
-			if (!comment) {
-				res.statusCode = HttpStatusCodes.NOT_FOUND;
+					throw Error(`Dish ${dishId} was not found`);
+				}
+
+				if (!dish.comments) {
+					throw new RouteError(
+						HttpStatusCodes.INTERNAL_SERVER_ERROR,
+						"Dish has no comments to get this one",
+					);
+				}
+
+				const comment = dish.comments.id(commentId);
+
+				if (!comment) {
+					res.statusCode = HttpStatusCodes.NOT_FOUND;
+					res.setHeader("Content-Type", "application/json");
+
+					throw Error(`Comment ${commentId} was not found`);
+				}
+
+				if (!comment.author.equals(req.user._id)) {
+					throw new RouteError(
+						HttpStatusCodes.FORBIDDEN,
+						"You have no permissions to remove this comment",
+					);
+				}
+
+				comment.remove();
+
+				const updatedDish = await dish.save();
+
+				res.statusCode = HttpStatusCodes.OK;
 				res.setHeader("Content-Type", "application/json");
-
-				throw Error(`Comment ${commentId} was not found`);
+				res.json(updatedDish);
+			} catch (err) {
+				console.error(err);
+				next(err);
 			}
-
-			if (!comment.author.equals(req.user._id)) {
-				throw new RouteError(
-					HttpStatusCodes.FORBIDDEN,
-					"You have no permissions to change this comment",
-				);
-			}
-
-			const { rating, comment: commentText } = req.body;
-
-			rating && comment.set({ rating });
-			commentText && comment.set({ comment: commentText });
-			req.user._id && comment.set({ author: req.user._id });
-
-			await dish.save();
-			const updatedDish = await Dishes.findById(dishId).populate(
-				"comments.author",
-			);
-
-			res.statusCode = HttpStatusCodes.OK;
-			res.setHeader("Content-Type", "application/json");
-			res.json(updatedDish);
-		} catch (err) {
-			console.error(err);
-			next(err);
-		}
-	})
-	.delete(PassportAuthService.verifyUser, async (req, res, next) => {
-		try {
-			if (!req.user) {
-				throw new RouteError(
-					HttpStatusCodes.UNAUTHORIZED,
-					"You are not authorize",
-				);
-			}
-
-			const { dishId, commentId } = req.params;
-			const dish = await Dishes.findById(dishId);
-
-			if (!dish) {
-				res.statusCode = HttpStatusCodes.NOT_FOUND;
-				res.setHeader("Content-Type", "application/json");
-
-				throw Error(`Dish ${dishId} was not found`);
-			}
-
-			if (!dish.comments) {
-				throw new RouteError(
-					HttpStatusCodes.INTERNAL_SERVER_ERROR,
-					"Dish has no comments to get this one",
-				);
-			}
-
-			const comment = dish.comments.id(commentId);
-
-			if (!comment) {
-				res.statusCode = HttpStatusCodes.NOT_FOUND;
-				res.setHeader("Content-Type", "application/json");
-
-				throw Error(`Comment ${commentId} was not found`);
-			}
-
-			if (!comment.author.equals(req.user._id)) {
-				throw new RouteError(
-					HttpStatusCodes.FORBIDDEN,
-					"You have no permissions to remove this comment",
-				);
-			}
-
-			comment.remove();
-
-			const updatedDish = await dish.save();
-
-			res.statusCode = HttpStatusCodes.OK;
-			res.setHeader("Content-Type", "application/json");
-			res.json(updatedDish);
-		} catch (err) {
-			console.error(err);
-			next(err);
-		}
-	});
+		},
+	);
 
 export { dishRouter };
