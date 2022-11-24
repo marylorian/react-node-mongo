@@ -40,3 +40,16 @@ SECRET=<your secret>
 DB_URL=<your DB URL>
 
 3. `npm run start`
+
+## Self Signed Certificate (SSC) creation for debugging
+
+1. create private.key
+`openssl genrsa 1024 > private.key`
+
+2. create cert
+`openssl req -new -key private.key -out cert.csr`
+
+3. sign certificate
+`openssl x509 -req -in cert.csr -signkey private.key -out certificate.pem`
+
+4. put `private.key` and `certificate.pem` files into bin/ directory

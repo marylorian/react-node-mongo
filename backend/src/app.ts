@@ -15,7 +15,16 @@ import { indexRouter } from "./routes/indexRouter";
 import { userRouter } from "./routes/userRouter";
 
 const app = express();
-const port = config.port;
+
+app.all("*", (req, res, next) => {
+	if (req.secure) {
+		return next();
+	}
+	res.redirect(
+		HttpStatusCodes.TEMPORARY_REDIRECT,
+		`https://${req.hostname}:${app.get("secPort")}${req.url}`,
+	);
+});
 
 mongoose
 	.connect(config.dataBaseUrl /*, { useMongoClient: true }*/)
@@ -35,7 +44,7 @@ if (config.environment === Environments.Prod) {
 }
 
 app.use(passport.initialize());
-import * as PassportAuthService from "./services/PassportAuthService/PasportAuthService";
+import "./services/PassportAuthService/PasportAuthService";
 
 app.use("/", indexRouter);
 app.use("/auth", userRouter);
@@ -52,6 +61,10 @@ app.use((err, req, res, next) => {
 		.json({ error: err.message });
 });
 
-app.listen(port, () => {
-	return console.log(`Express is listening at http://localhost:${port}`);
+app.listen(config.port, () => {
+	return console.log(
+		`Express is listening at http://localhost:${config.port}`,
+	);
 });
+
+export default app;

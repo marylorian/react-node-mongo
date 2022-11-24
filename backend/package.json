@@ -5,7 +5,7 @@
   "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && ts-node src/app.ts",
+    "start": "tsc && ts-node src/pre-start.ts",
     "lint": "eslint src/ --ext .ts",
     "prettier-check": "prettier --check .",
     "prettier": "prettier --write ."
@@ -40,6 +40,7 @@
     "fs": "^0.0.1-security",
     "helmet": "^6.0.0",
     "http": "^0.0.1-security",
+    "https": "^1.0.0",
     "jet-logger": "^1.2.6",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.12.0",
