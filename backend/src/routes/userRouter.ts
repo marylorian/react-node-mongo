@@ -98,8 +98,12 @@ userRouter.get(
 
 		res.setHeader("Content-Type", "application/json");
 		res.status(HttpStatusCodes.OK);
+
+		const user = await Users.findById(req.user?._id);
+
 		return res.json({
 			token,
+			user,
 			status: `login ${req.body.username} successful`,
 		});
 	},

@@ -18,8 +18,14 @@ import { favoritesRouter } from "./routes/favoriteRouter";
 
 const app = express();
 
+app.disable("x-powered-by");
+
 // https
 app.all("*", (req, res, next) => {
+	if (config.environment === Environments.Dev) {
+		console.info("Next request ran without https due to development mode");
+		return next();
+	}
 	if (req.secure) {
 		return next();
 	}
@@ -35,6 +41,14 @@ mongoose
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+if (config.environment === Environments.Dev) {
+	app.all("*", (req, res, next) => {
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Credentials", "true");
+		next();
+	});
+}
 
 // Show routes called in console during development
 if (config.environment === Environments.Dev) {

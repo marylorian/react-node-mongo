@@ -13,5 +13,5 @@ const corsOptionsDelegate = (req, callback) => {
 	callback(null, corsOptions); // callback expects two parameters: error and options
 };
 
-export const cors = corsLib();
+export const cors = corsLib(corsOptionsDelegate);
 export const corsWithOptions = corsLib(corsOptionsDelegate);

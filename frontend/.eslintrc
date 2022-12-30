@@ -1,13 +1,13 @@
 {
   "env": {
     "browser": true,
-    "es2021": true,
+    "es2021": true
   },
   "extends": [
     "react-app",
     "react-app/jest",
-    "eslint:recommended", 
-    "plugin:react/recommended", 
+    "eslint:recommended",
+    "plugin:react/recommended",
     "standard-with-typescript"
   ],
   "overrides": [],
@@ -22,11 +22,5 @@
     "semi": ["warn", "always"],
     "quotes": ["warn", "double"]
   },
-  "ignorePatterns": [
-    "dist/",
-    "public/",
-    "node_modules",
-    "*env*",
-    "src/"
-  ]
+  "ignorePatterns": ["dist/", "public/", "node_modules", "*env*", "src/"]
 }

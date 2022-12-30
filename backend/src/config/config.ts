@@ -10,6 +10,8 @@ interface ProcessEnv {
 	DB_URL?: string;
 	SECRET?: string;
 	ORIGINS_WHITELIST?: string;
+	DB_USERNAME?: string;
+	DB_PASSWORD?: string;
 }
 
 interface Config {
@@ -25,18 +27,28 @@ const getConfig = (): Config => {
 		NODE_ENV,
 		PORT,
 		DB_URL,
+		DB_PASSWORD,
+		DB_USERNAME,
 		SECRET,
 		ORIGINS_WHITELIST = "",
 	} = process.env as ProcessEnv;
 
-	if (!DB_URL || !SECRET) {
+	if (!DB_URL || !SECRET || !DB_PASSWORD || !DB_USERNAME) {
 		throw Error("Server ran with incorrect configuration");
 	}
+
+	const dataBaseUrl = DB_URL.split("mongodb+srv://").reduce(
+		(acc, str) =>
+			!acc
+				? `mongodb+srv://`
+				: `${acc}${DB_USERNAME}:${DB_PASSWORD}@${str}`,
+		"",
+	);
 
 	return {
 		environment: (NODE_ENV as Environments) || Environments.Dev,
 		port: PORT && !isNaN(Number(PORT)) ? Number(PORT) : 8080,
-		dataBaseUrl: DB_URL as string,
+		dataBaseUrl,
 		secret: SECRET as string,
 		originsWhitelist: ORIGINS_WHITELIST.split(",") || [],
 	};
